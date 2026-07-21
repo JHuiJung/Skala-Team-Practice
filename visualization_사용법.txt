@@ -1,0 +1,80 @@
+visualization.py 사용법
+
+개요
+- preprocessing.py의 run_pandas()로 전처리한 Yellow Taxi 데이터를 받아
+  Seaborn 정적 차트 3종, Plotly 인터랙티브 차트 3종을 그려주는 모듈입니다.
+- 분포(distribution) / 상관관계(correlation) / 그룹 비교(group comparison)
+  세 가지 유형을 각각 Seaborn, Plotly로 제공합니다.
+
+
+1. 사전 준비
+
+1-1. 필요 패키지 설치 (requirements.txt에 포함되어 있음)
+    pip install -r requirements.txt
+
+1-2. data 폴더에 원본 parquet 파일이 있어야 합니다.
+    data/yellow_tripdata_2026-05.parquet
+
+
+2. 다른 파이썬 파일에서 불러와 쓰는 법
+
+    from preprocessing import run_pandas
+    from visualization import (
+        plot_distance_distribution_seaborn,
+        plot_distance_distribution_plotly,
+        plot_correlation_heatmap_seaborn,
+        plot_correlation_heatmap_plotly,
+        plot_fare_by_passenger_count_seaborn,
+        plot_fare_by_passenger_count_plotly,
+    )
+
+    # 1) preprocessing으로 결측치 처리까지 끝난 데이터를 받는다
+    trips = run_pandas("data/yellow_tripdata_2026-05.parquet")
+
+    # 2) 원하는 차트 함수를 호출한다 (save_path를 주면 파일로 저장, 안 주면 Figure 객체만 반환)
+    plot_distance_distribution_seaborn(trips, save_path="distribution_seaborn.png")
+    plot_correlation_heatmap_plotly(trips, save_path="correlation_plotly.html")
+
+
+3. 함수 목록
+
+[분포 - trip_distance 히스토그램]
+- plot_distance_distribution_seaborn(trips, column="trip_distance", save_path=None)
+- plot_distance_distribution_plotly(trips, column="trip_distance", save_path=None, sample_size=20000)
+  * column 인자에 fare_amount, tip_amount 등 다른 수치형 컬럼명을 넣어도 동작합니다.
+
+[상관관계 - 피처 간 상관계수 히트맵]
+- plot_correlation_heatmap_seaborn(trips, columns=CORRELATION_COLUMNS, save_path=None)
+- plot_correlation_heatmap_plotly(trips, columns=CORRELATION_COLUMNS, save_path=None)
+  * 기본 columns: trip_distance, fare_amount, tip_amount, RatecodeID,
+    PULocationID, DOLocationID, passenger_count
+
+[그룹 비교 - 승객 수(passenger_count)별 요금(fare_amount) 박스플롯]
+- plot_fare_by_passenger_count_seaborn(trips, group_col="passenger_count", value_col="fare_amount", save_path=None)
+- plot_fare_by_passenger_count_plotly(trips, group_col="passenger_count", value_col="fare_amount", save_path=None, sample_size=20000)
+  * group_col, value_col을 바꾸면 다른 그룹/값 조합도 비교할 수 있습니다.
+    예: RatecodeID별 trip_distance 비교
+
+
+4. 저장 파일 형식
+- Seaborn 함수 -> save_path에 .png 등 이미지 확장자로 저장 (matplotlib Figure)
+- Plotly 함수  -> save_path에 .html 확장자로 저장 (브라우저에서 열면 인터랙티브)
+- save_path를 생략하면 파일로 저장하지 않고 Figure 객체만 반환하므로,
+  Jupyter/스크립트 안에서 바로 화면에 띄우거나 추가로 가공할 수 있습니다.
+
+
+5. 직접 실행해서 샘플 결과 확인하기
+
+    python visualization.py
+
+- 위 명령을 실행하면 outputs/ 폴더가 생성되고 6개 차트 파일이 모두 저장됩니다.
+  (distribution_seaborn.png, distribution_plotly.html,
+   correlation_seaborn.png, correlation_plotly.html,
+   group_comparison_seaborn.png, group_comparison_plotly.html)
+- outputs/ 폴더는 .gitignore에 등록되어 있어 git에는 올라가지 않습니다.
+
+
+6. 참고
+- 이 모듈은 순수하게 차트를 그리는 기능만 담당합니다. 결측치/이상치 처리는
+  포함하지 않으므로, trips는 이상치 처리까지 끝난 상태로 넘겨받는 것을
+  전제로 합니다 (해당 처리는 main 브랜치의 preprocessing.py 쪽에서 담당).
