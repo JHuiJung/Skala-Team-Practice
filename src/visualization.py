@@ -208,7 +208,7 @@ def plot_fare_by_passenger_count_plotly(
 if __name__ == "__main__":
     from preprocessing import run_pandas
 
-    project_dir = Path(__file__).resolve().parent
+    project_dir = Path(__file__).resolve().parents[1]
     data_path = project_dir / "data" / "yellow_tripdata_2026-05.parquet"
     output_dir = project_dir / "outputs"
     output_dir.mkdir(exist_ok=True)

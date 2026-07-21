@@ -5,6 +5,8 @@ data/
 __pycache__
 *.pyc
 .coverage
-.vscode*.joblib
-.pytest_cache
+.vscode
 *.joblib
+.pytest_cache/
+outputs/
+src/outputs/

@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from src.statistics import (
+from src.statistical_analysis import (
     FEATURES,
     TARGET,
     compute_correlation_matrix,
