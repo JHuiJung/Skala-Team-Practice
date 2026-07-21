@@ -12,6 +12,7 @@ docopt==0.6.2
 executing==2.2.1
 fastjsonschema==2.21.2
 idna==3.18
+iniconfig==2.3.0
 ipython==8.12.3
 jedi==0.20.0
 Jinja2==3.1.6
@@ -35,6 +36,7 @@ pexpect==4.9.0
 pickleshare==0.7.5
 pipreqs==0.5.0
 platformdirs==4.10.1
+pluggy==1.6.0
 polars==1.43.0
 polars-runtime-32==1.43.0
 prompt_toolkit==3.0.52
@@ -42,6 +44,7 @@ ptyprocess==0.7.0
 pure_eval==0.2.3
 pyarrow==25.0.0
 Pygments==2.20.0
+pytest==9.1.1
 python-dateutil==2.9.0.post0
 pyzmq==27.1.0
 referencing==0.37.0
