@@ -12,15 +12,9 @@ from pathlib import Path
 from preprocessing import run_pandas, run_polars
 
 
-def main() -> None:
+if __name__ == "__main__":
     project_dir = Path(__file__).resolve().parent
     data_path = project_dir / "data" / "yellow_tripdata_2026-05.parquet"
 
-    trips_pd_cleaned = run_pandas(data_path)
-    trips_pl_cleaned = run_polars(data_path)
-
-    return trips_pd_cleaned, trips_pl_cleaned
-
-
-if __name__ == "__main__":
-    main()
+    run_pandas(data_path)
+    run_polars(data_path)
