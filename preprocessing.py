@@ -13,6 +13,7 @@ pandas 버전과 Polars 버전을 각각 제공한다.
 변경 내역
 - 2026-07-21 parquet 데이터 로드 및 pandas/Polars 결측치 처리 함수 작성
 - 2026-07-21 practice5.py를 다른 스크립트에서 재사용할 수 있도록 preprocessing.py 모듈로 분리, EDA 함수 추가
+- 2026-07-21 이상치(음수) 제거와 ID 컬럼 int 캐스팅 함수 추가
 """
 
 from pathlib import Path
@@ -24,6 +25,12 @@ import polars as pl
 NUMERIC_FILL_VALUE = 0  # RatecodeID, congestion_surcharge, Airport_fee 등
 CATEGORICAL_FILL_VALUE = "N"  # store_and_fwd_flag
 PASSENGER_COUNT_FILL_STRATEGY = "median"  # passenger_count는 중앙값으로 대체
+
+# 음수면 안 되는 컬럼 (이상치 제거 대상)
+NON_NEGATIVE_COLUMNS = ["trip_distance", "fare_amount", "tip_amount", "passenger_count"]
+
+# 실제로는 카테고리성 ID인데 float로 로드되는 컬럼 (int로 캐스팅)
+ID_COLUMNS_TO_CAST = ["RatecodeID", "PULocationID", "DOLocationID"]
 
 
 # =========================================================
@@ -67,10 +74,25 @@ def handle_missing_values_pandas(trips: pd.DataFrame) -> pd.DataFrame:
     return trips
 
 
+def clean_data_pandas(trips: pd.DataFrame) -> pd.DataFrame:
+    """pandas 기반으로 음수 이상치를 제거하고 카테고리성 ID 컬럼을 int로 캐스팅한다."""
+    trips = trips.copy()
+
+    for column in NON_NEGATIVE_COLUMNS:
+        trips = trips[trips[column] >= 0]
+
+    for column in ID_COLUMNS_TO_CAST:
+        trips[column] = trips[column].astype(int)
+
+    return trips
+
+
 def run_pandas(parquet_path: str | Path) -> pd.DataFrame:
-    """parquet 파일명을 받아 pandas로 로드하고 결측치를 처리한 DataFrame을 반환한다."""
+    """parquet 파일명을 받아 pandas로 로드하고 결측치/이상치 처리, 타입 캐스팅까지 수행한 DataFrame을 반환한다."""
     trips = load_yellow_tripdata_pandas(parquet_path)
-    return handle_missing_values_pandas(trips)
+    trips = handle_missing_values_pandas(trips)
+    trips = clean_data_pandas(trips)
+    return trips
 
 
 # =========================================================
@@ -108,7 +130,19 @@ def handle_missing_values_polars(trips: pl.DataFrame) -> pl.DataFrame:
     )
 
 
+def clean_data_polars(trips: pl.DataFrame) -> pl.DataFrame:
+    """Polars 기반으로 음수 이상치를 제거하고 카테고리성 ID 컬럼을 int로 캐스팅한다."""
+    for column in NON_NEGATIVE_COLUMNS:
+        trips = trips.filter(pl.col(column) >= 0)
+
+    return trips.with_columns(
+        [pl.col(column).cast(pl.Int64) for column in ID_COLUMNS_TO_CAST]
+    )
+
+
 def run_polars(parquet_path: str | Path) -> pl.DataFrame:
-    """parquet 파일명을 받아 Polars로 로드하고 결측치를 처리한 DataFrame을 반환한다."""
+    """parquet 파일명을 받아 Polars로 로드하고 결측치/이상치 처리, 타입 캐스팅까지 수행한 DataFrame을 반환한다."""
     trips = load_yellow_tripdata_polars(parquet_path)
-    return handle_missing_values_polars(trips)
+    trips = handle_missing_values_polars(trips)
+    trips = clean_data_polars(trips)
+    return trips
