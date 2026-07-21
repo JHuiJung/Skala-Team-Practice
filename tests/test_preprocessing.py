@@ -14,9 +14,18 @@ import pandas as pd
 import polars as pl
 import pytest
 
-from preprocessing import ID_COLUMNS_TO_CAST, NON_NEGATIVE_COLUMNS, run_pandas, run_polars
+from src.preprocessing import (
+    ID_COLUMNS_TO_CAST,
+    NON_NEGATIVE_COLUMNS,
+    run_pandas,
+    run_polars,
+)
 
-DATA_PATH = Path(__file__).resolve().parent / "data" / "yellow_tripdata_2026-05.parquet"
+DATA_PATH = (
+    Path(__file__).resolve().parents[1]
+    / "data"
+    / "yellow_tripdata_2026-05.parquet"
+)
 
 
 @pytest.fixture(scope="module")

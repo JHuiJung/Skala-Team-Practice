@@ -14,7 +14,12 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from model import FEATURE_COLUMNS, build_pipeline, prepare_model_data, train_and_evaluate
+from src.model import (
+    FEATURE_COLUMNS,
+    build_pipeline,
+    prepare_model_data,
+    train_and_evaluate,
+)
 
 
 def make_sample_data(rows: int = 120) -> pd.DataFrame:

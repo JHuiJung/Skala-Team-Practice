@@ -23,7 +23,7 @@ from sklearn.metrics import accuracy_score, classification_report, f1_score
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 
-from preprocessing import run_pandas
+from src.preprocessing import run_pandas
 
 
 FEATURE_COLUMNS = [
@@ -35,7 +35,7 @@ FEATURE_COLUMNS = [
     "DOLocationID",
 ]
 TARGET_COLUMN = "passenger_count"
-PROJECT_DIR = Path(__file__).resolve().parent
+PROJECT_DIR = Path(__file__).resolve().parents[1]
 DEFAULT_DATA_PATH = PROJECT_DIR / "data" / "yellow_tripdata_2026-05.parquet"
 DEFAULT_MODEL_PATH = PROJECT_DIR / "passenger_count_model.joblib"
 
