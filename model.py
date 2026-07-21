@@ -1,5 +1,5 @@
 """NYC Yellow Taxi 승객 수(passenger_count) 분류 모델 학습 모듈.
-
+코드 작성자: 임창우
 전처리된 pandas/Polars DataFrame을 입력받아 scikit-learn Pipeline으로
 학습하고 정확도와 weighted F1 점수를 출력한 뒤 joblib 파일로 저장한다.
 
@@ -35,7 +35,9 @@ FEATURE_COLUMNS = [
     "DOLocationID",
 ]
 TARGET_COLUMN = "passenger_count"
-DEFAULT_MODEL_PATH = Path(__file__).resolve().parent / "passenger_count_model.joblib"
+PROJECT_DIR = Path(__file__).resolve().parent
+DEFAULT_DATA_PATH = PROJECT_DIR / "data" / "yellow_tripdata_2026-05.parquet"
+DEFAULT_MODEL_PATH = PROJECT_DIR / "passenger_count_model.joblib"
 
 
 def prepare_model_data(trips: Any) -> tuple[pd.DataFrame, pd.Series]:
@@ -57,7 +59,8 @@ def prepare_model_data(trips: Any) -> tuple[pd.DataFrame, pd.Series]:
         raise ValueError("학습 가능한 행이 없습니다.")
 
     # passenger_count는 사람 수이므로 정수형 클래스 라벨로 사용한다.
-    target_numeric = pd.to_numeric(selected[TARGET_COLUMN], errors="coerce")
+    target_numeric = selected[TARGET_COLUMN]
+    target_numeric = pd.to_numeric(target_numeric, errors="coerce")
     valid_target = target_numeric.notna() & (target_numeric >= 0)
     selected = selected.loc[valid_target]
     target_numeric = target_numeric.loc[valid_target]
@@ -143,7 +146,13 @@ def train_and_evaluate(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="승객 수 분류 모델 학습")
-    parser.add_argument("data_path", type=Path, help="Yellow Taxi parquet 파일 경로")
+    parser.add_argument(
+        "data_path",
+        type=Path,
+        nargs="?",
+        default=DEFAULT_DATA_PATH,
+        help=f"Yellow Taxi parquet 파일 경로 (기본값: {DEFAULT_DATA_PATH})",
+    )
     parser.add_argument(
         "--model-path",
         type=Path,
