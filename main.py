@@ -15,6 +15,7 @@ from pathlib import Path
 
 from src.model import train_and_evaluate
 from src.preprocessing import run_pandas, run_polars
+from src.report import generate_report
 from src.statistical_analysis import run_statistical_analysis
 from src.visualization import (
     plot_correlation_heatmap_plotly,
@@ -66,9 +67,30 @@ if __name__ == "__main__":
     print(f"시각화 저장 완료: {output_dir}")
 
     # preprocessing에서 만든 DataFrame을 다시 읽지 않고 모델에 바로 전달한다.
-    model, model_metrics = train_and_evaluate(df_pandas)
+    model_path = project_dir / "passenger_count_model.joblib"
+    model, model_metrics = train_and_evaluate(df_pandas, model_path=model_path)
 
     print("Pandas DataFrame")
     print(df_pandas)
     print("Polars DataFrame")
     print(df_polars)
+
+    # report.md에서는 outputs/ 기준 상대경로로 링크해야 마크다운 뷰어에서 바로 열린다.
+    visualization_paths = {
+        "trip_distance 분포 (Seaborn)": "outputs/distribution_seaborn.png",
+        "trip_distance 분포 (Plotly)": "outputs/distribution_plotly.html",
+        "피처 간 상관관계 (Seaborn)": "outputs/correlation_seaborn.png",
+        "피처 간 상관관계 (Plotly)": "outputs/correlation_plotly.html",
+        "승객 수별 fare_amount 비교 (Seaborn)": "outputs/group_comparison_seaborn.png",
+        "승객 수별 fare_amount 비교 (Plotly)": "outputs/group_comparison_plotly.html",
+    }
+    report_path = generate_report(
+        df_pandas,
+        df_polars,
+        stats_result,
+        model_metrics,
+        model_path,
+        visualization_paths,
+        output_path=project_dir / "report.md",
+    )
+    print(f"리포트 저장 완료: {report_path}")
