@@ -5,4 +5,6 @@ data/
 __pycache__
 *.pyc
 .coverage
-.vscode
+.vscode*.joblib
+
+*.joblib
