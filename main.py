@@ -21,7 +21,9 @@ if __name__ == "__main__":
 
     df_pandas = run_pandas(data_path)
     df_polars = run_polars(data_path)
-    
+
+    stats_result = run_statistical_analysis(df_pandas, print_output=True)
+
     print("Pandas DataFrame")
     print(df_pandas)
     print("Polars DataFrame")
